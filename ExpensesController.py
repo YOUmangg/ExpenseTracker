@@ -8,7 +8,7 @@ import seaborn as sns
 
 DB_FILE = 'expenses.db'
 
-classes = ['Travel', 'Food', 'Beverage', 'Home Food Essentials', 'Clothing', 'Home 1', 'Enjoyment', 'Gifts', 'Tips']
+classes = ['Travel', 'Food', 'Beverage', 'Home Food Essentials', 'Rent', 'Cook', 'Bills', 'Clothing', 'Home 1', 'Enjoyment', 'Gifts', 'Tips']
 
 def add_column():
     conn = sqlite3.connect(DB_FILE)
@@ -20,8 +20,6 @@ def add_column():
     conn.close()
     print("Column 'category' added successfully!")
 
-# Call this function where appropriate in your code
-# For example, you can call it in the main function or wherever you need to add the column
 # add_column()  # Uncomment this line to execute the column addition
 
 def init_db():
@@ -42,9 +40,7 @@ def update_category_for_existing_rows():
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
     
-    # Update the 'category' column for all existing rows
-    # cursor.execute("UPDATE expenses SET category = 'Home 1' WHERE name LIKE '%Balle%' ")
-    # cursor.execute("UPDATE expenses SET category = 'Home 1' WHERE name LIKE '%Mummy%' ")
+    # Update the 'category' column for existing rows
     cursor.execute("UPDATE expenses SET category = 'Enjoyment' WHERE name LIKE '%Yellow%' ")
     conn.commit()
     conn.close()
@@ -52,7 +48,6 @@ def update_category_for_existing_rows():
 
 # update_category_for_existing_rows()  # Uncomment this line to execute the update
 
-print(classes)
 def add_expense(date, name, amount):
     conn = sqlite3.connect(DB_FILE)
     expense_class = tell_class(name, classes)
@@ -87,48 +82,31 @@ def daily_view():
     total_expense = 0
     dict_datenametotal = {}
     for row in rows:
-        row_name = row[1].split()
-        # print(row_name)
         row_name = row[1].split()[0]
         # Initialize the list for new date keys
-        # if row[1] not in dict_datenametotal:
         if row_name not in dict_datenametotal:
-            # dict_datenametotal[row[1]] = []
             dict_datenametotal[row_name] = []
         
-        # dict_datenametotal[row[1]].append([row[2], row[3]]) #name, amount list
         dict_datenametotal[row_name].append([row[2], row[3]]) #name, amount list
-        # print(f'Date: {row[1]}, Name: {row[2]}, Amount: {row[3]}')
         print(f'Date: {row_name}, Name: {row[2]}, Amount: {row[3]}')
         total_expense += row[3]
     
-    # print('Total expense = ', total_expense)
     conn.close()
 
     final_dict = {} 
 
-    # for key in final_dict.keys():
-        # print(key, final_dict[key])
-
-    # print('-' * 100)
     #create another dict with one key value pair
     for key in dict_datenametotal.keys():
         total_val = 0
         name = ""
-        # if(len(dict_datenametotal[key]) > 1):
+
         for val in dict_datenametotal[key]:
             name += "_" + val[0]
             total_val += val[1]
         
         final_dict[key + '_' + name] = total_val
     
-    # for key in final_dict.keys():
-        # print(key, final_dict[key])
-
-    # plt.figure(figsize=(12, 12))
-    # sns.barplot(x = list(final_dict.keys()), y = [final_dict[key] for key in final_dict.keys()])
-    # plt.show()
-    
+    #Plot creation
     plt.figure(figsize=(12, 6))  # Adjusted figure size for better aesthetics
     sns.barplot(x = list(final_dict.keys()), y = [final_dict[key] for key in final_dict.keys()])
     
@@ -137,7 +115,7 @@ def daily_view():
     plt.xlabel('Date', fontsize=14)  # Label for x-axis
     plt.ylabel('Total Amount', fontsize=14)  # Label for y-axis
     plt.xticks(rotation=45)  # Rotate x-axis labels for better readability
-    plt.grid(axis='y')  # Add grid lines for better readability
+    plt.grid(axis='y')  #grid lines for better readability
     
     plt.show()
                 
@@ -151,11 +129,10 @@ def daily_view():
             name += "_" + val[0]
             total_val += val[1]
         
-        final_dict[date_part + '_' + name] = total_val  # Use date_part as key
+        final_dict[date_part + '_' + name] = total_val  # date_part as key
     
-    # ... existing code ...
     #Plot monthly view
-    return dict_datenametotal
+    return dict_datenametotal #Check why I am returning this
 
 def delete_expense():
     conn = sqlite3.connect(DB_FILE)
