@@ -1,6 +1,5 @@
 *.mwb
 *.db
-
 *.env
 *.pyc
 __pycache__/
