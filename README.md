@@ -49,4 +49,4 @@ Inspired by the need for simple personal finance management tools.
 
 Special thanks to all open-source contributors and the Python community.
 
-For questions or support, please contact lalumang03@gmail.com.
+For questions or support, please contact <a href = "mailto:lalumang03@gmail.com"> lalumang03@gmail.com </a>
