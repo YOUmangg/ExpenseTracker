@@ -278,3 +278,18 @@ def delete_expense():
         print("Please enter a valid number!")
     finally:
         conn.close()
+
+def export_expenses_to_csv():
+    import csv
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM expenses")
+    rows = cursor.fetchall()
+    
+    with open('expenses.csv', 'w', newline='') as csvfile:
+        csv_writer = csv.writer(csvfile)
+        csv_writer.writerow(['Expense ID', 'Date', 'Name', 'Amount', 'Category'])
+        csv_writer.writerows(rows)
+    
+    conn.close()
+    print("Expenses exported to expenses.csv successfully!")

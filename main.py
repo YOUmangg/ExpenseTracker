@@ -20,7 +20,8 @@ def main():
         print('2. View all expenses')
         print('3. Explore your expenditure')
         print('4. Delete an expense')
-        print('5. Exit')
+        print('5. Export expenses to CSV')
+        print('6. Exit')
 
         choice = int(input("Enter your choice: "))
         
@@ -57,6 +58,9 @@ def main():
             time.sleep(1)
 
         elif choice == 5:
+            export_expenses_to_csv()
+            time.sleep(1)
+        elif choice == 6:
             print('Thank you for using the Expense Tracker! Saving your details...')
             break
 
