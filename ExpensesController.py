@@ -10,17 +10,26 @@ DB_FILE = 'expenses.db'
 
 classes = ['Travel', 'Food', 'Beverage', 'Home Food Essentials', 'Rent', 'Cook', 'Bills', 'Clothing', 'Home 1', 'Enjoyment', 'Gifts', 'Tips']
 
-def add_column():
+def add_column(column_name):
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
     
-    # Add a new column 'category' to the 'expenses' table
-    cursor.execute("ALTER TABLE expenses ADD COLUMN category TEXT")
+    # Check if the column already exists
+    cursor.execute("PRAGMA table_info(expenses)")
+    columns = [col[1] for col in cursor.fetchall()]
+    if column_name in columns:
+        # If the column already exists, print a message and return
+        print(f"Column '{column_name}' already exists in the expenses table.")
+        conn.close()
+        return
+    # Add the new column
+    print(f"Adding column '{column_name}' to the expenses table...")
+    cursor.execute(f"ALTER TABLE expenses ADD COLUMN {column_name} TEXT DEFAULT 'Enjoyment'")
     conn.commit()
     conn.close()
     print("Column 'category' added successfully!")
 
-# add_column()  # Uncomment this line to execute the column addition
+# add_column('category')  # Uncomment this line to execute the column addition
 
 def init_db():
     conn = sqlite3.connect(DB_FILE)
@@ -30,8 +39,8 @@ def init_db():
                    expense_id INTEGER PRIMARY KEY AUTOINCREMENT, 
                    date TEXT, 
                    name TEXT,
-                   amount INTEGER
-                   )
+                   amount INTEGER,
+                   category TEXT DEFAULT 'Enjoyment')  -- Default category set to 'Enjoyment'
                    ''')
     conn.commit()
     conn.close()
@@ -133,6 +142,77 @@ def daily_view():
     
     #Plot monthly view
     return dict_datenametotal #Check why I am returning this
+
+def plot_expense_distribution():
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute("SELECT category, SUM(amount) FROM expenses GROUP BY category")
+    rows = cursor.fetchall()
+    
+    categories = [row[0] for row in rows]
+    amounts = [row[1] for row in rows]
+
+    # Create a pie chart
+    plt.figure(figsize=(8, 8))
+    plt.pie(amounts, labels=categories, autopct='%1.1f%%', startangle=140)
+    plt.title('Expense Distribution by Category')
+    plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+    plt.show()
+    
+    conn.close()
+
+# Call the function to plot the pie chart
+# plot_expense_distribution()  # Uncomment this line to execute the pie chart plotting
+
+def monthly_exploration():
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    
+    # Prompt user for the month and year
+    month = int(input("Enter the month (1-12) you want to explore: "))
+    year = int(input("Enter the year (YYYY) you want to explore: "))
+    
+    # Fetch expenses for the selected month and year
+    cursor.execute("SELECT * FROM expenses WHERE strftime('%Y', date) = ? AND strftime('%m', date) = ?", (str(year), f"{month:02}"))
+    rows = cursor.fetchall()
+    
+    if not rows:
+        print("No expenses found for the selected month and year.")
+        conn.close()
+        return
+    
+    total_expense = 0
+    expense_dict = {}
+    
+    for row in rows:
+        print(f'Date: {row[1]}, Name: {row[2]}, Amount: {row[3]}, Category: {row[4]}')
+        total_expense += row[3]
+        
+        # Aggregate expenses by name
+        if row[2] in expense_dict:
+            expense_dict[row[2]] += row[3]
+        else:
+            expense_dict[row[2]] = row[3]
+    
+    print('Total expense for {}/{} = {}'.format(month, year, total_expense))
+    
+    # Plotting the expenses
+    plt.figure(figsize=(12, 6))
+    plt.bar(expense_dict.keys(), expense_dict.values(), color='skyblue')
+    
+    # Beautifying the plot
+    plt.title(f'Expenses for {month}/{year}', fontsize=16)
+    plt.xlabel('Expense Name', fontsize=14)
+    plt.ylabel('Amount', fontsize=14)
+    plt.xticks(rotation=45)  # Rotate x-axis labels for better readability
+    plt.grid(axis='y')  # Add grid lines for better readability
+    
+    plt.show()
+    
+    conn.close()
+
+# Call the function to explore monthly expenses
+# monthly_exploration()  # Uncomment this line to execute the monthly exploration
 
 def delete_expense():
     conn = sqlite3.connect(DB_FILE)

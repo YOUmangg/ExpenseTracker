@@ -2,8 +2,6 @@
 # #exploration of expenses. 
 # #Terminal optimization, representation thought
 
-# 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
-
 import datetime
 import sqlite3
 from ai import send_query_date_extract, tell_class
@@ -46,11 +44,14 @@ def main():
         elif choice == 3:
             # Placeholder for future exploration logic
             print("Which one of the following graphs would you like to see?")
-            print("1. Monthly Exploration \n2. Weekly Exploration \n3. Daily Exploration")
+            print("1. Monthly Exploration \n2. Weekly Exploration \n3. Daily Exploration \n4. Class Exploration")
             exp_choice = int(input())
-            if(exp_choice == 3):
+            if(exp_choice == 1):
+                monthly_exploration()
+            elif(exp_choice == 3):
                 daily_view()
-                
+            elif(exp_choice == 4):
+                plot_expense_distribution()
         elif choice == 4:
             delete_expense()
             time.sleep(1)
