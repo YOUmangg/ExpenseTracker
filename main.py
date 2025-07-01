@@ -1,7 +1,3 @@
-# #storage of expenses in sql database
-# #exploration of expenses. 
-# #Terminal optimization, representation thought
-
 import datetime
 import sqlite3
 from ai import send_query_date_extract, tell_class

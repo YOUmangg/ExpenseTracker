@@ -1,13 +1,12 @@
 import sqlite3
-import datetime
-import sqlite3
 from ai import send_query_date_extract, tell_class
-import time
 import matplotlib.pyplot as plt
 import seaborn as sns
+import csv
 
 DB_FILE = 'expenses.db'
 
+# List of classes for expenses, but need to store it in a db which can be updated by the llm.
 classes = ['Travel', 'Food', 'Beverage', 'Home Food Essentials', 'Rent', 'Cook', 'Bills', 'Clothing', 'Home 1', 'Enjoyment', 'Gifts', 'Tips']
 
 def add_column(column_name):
@@ -18,7 +17,7 @@ def add_column(column_name):
     cursor.execute("PRAGMA table_info(expenses)")
     columns = [col[1] for col in cursor.fetchall()]
     if column_name in columns:
-        # If the column already exists, print a message and return
+        # If the column already exists, just print a message and return
         print(f"Column '{column_name}' already exists in the expenses table.")
         conn.close()
         return
@@ -204,8 +203,8 @@ def monthly_exploration():
     plt.title(f'Expenses for {month}/{year}', fontsize=16)
     plt.xlabel('Expense Name', fontsize=14)
     plt.ylabel('Amount', fontsize=14)
-    plt.xticks(rotation=45)  # Rotate x-axis labels for better readability
-    plt.grid(axis='y')  # Add grid lines for better readability
+    plt.xticks(rotation=45)  # Rotating x-axis labels for better readability
+    plt.grid(axis='y')  # Adding grid lines for better readability
     
     plt.show()
     
@@ -280,7 +279,6 @@ def delete_expense():
         conn.close()
 
 def export_expenses_to_csv():
-    import csv
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM expenses")
